@@ -1,48 +1,55 @@
 <?php
 
-header("Access-Control-Allow-Origin: http://localhost:4200");
-header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method, Token");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+use App\Controller\Api;
+use App\Http\Request;
+use App\Http\Response;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $data = json_decode(file_get_contents('php://input'), true);
+require_once "./vendor/autoload.php";
 
-  if (empty($data['secret'])) {
-      header('Content-type: application/json');
-      echo json_encode(['success' => false, 'error-codes' => 'missing-input-secret']);
-      exit();
-  }
+//if(!isset($_SERVER["HTTPS"])){
+//    return;
+//}
+$origin = $_SERVER['HTTP_ORIGIN'];
+$allowedDomains = [
+    'http://localhost:4200',
+    'https://daroz.dev',
+    'https://luanacrepaldiadvogada.com'
+];
 
-  if (empty($data['response'])) {
-    header('Content-type: application/json');
-    echo json_encode(['success' => false, 'error-codes' => 'missing-input-response']);
-    exit();
+if (in_array($origin, $allowedDomains)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+}
+header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Curl-Method, Token");
+header("Access-Control-Allow-Methods: POST, OPTIONS, PUT, DELETE");
+
+$req = new Request;
+$res = new Response;
+$api = new Api;
+
+if ($req->methodValidation()) {
+    $res->send('Method not allowed.', 405);
+    return;
 }
 
-  $secret = $data['secret'];
-  $response = $data['response'];
-
-  $res = captchaValidation($secret, $response);
-
-  header('Content-type: application/json');
-  echo json_encode($res);
+if ($req->getUri() != '/') {
+    $res->send('Url not found.', 404);
+    return;
 }
 
-function captchaValidation($secret, $response) {
+if($req->getHttpMethod() === 'GET') {
+    $api->getInfo();
+}
 
-$url = "https://www.google.com/recaptcha/api/siteverify";
 
-$curl = curl_init();
+if ($req->getHttpMethod() === 'POST') {
+    $payload = $req->getPayload();
 
-curl_setopt($curl, CURLOPT_URL,$url);
-curl_setopt($curl, CURLOPT_POST, 1);
-curl_setopt($curl, CURLOPT_POSTFIELDS, "secret=$secret&response=$response");
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    if (empty($payload['secret']) or empty($payload['response'])) {
+        $message = empty($data['secret']) ? 'missing-input-secret' : 'missing-input-response';
 
-$res = curl_exec($curl);
+        $res->send($message);
+        return;
+    }
 
-curl_close($curl);
-
-return $res;
-
+    $api->recaptchaVerify($payload);
 }

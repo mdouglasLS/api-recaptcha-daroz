@@ -1,0 +1,8 @@
+{
+  "name": "recaptcha-api/recaptcha-api",
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  }
+}
