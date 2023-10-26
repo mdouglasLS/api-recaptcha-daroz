@@ -28,7 +28,7 @@ RUN chown -R ${USER} /var/www
 
 USER ${USER}
 
-COPY --chown=${USER}:${GROUP} . .
+COPY --chown=${USER}:${GROUP} .. .
 
 EXPOSE 9000
 
