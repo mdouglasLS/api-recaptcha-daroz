@@ -7,7 +7,7 @@ class Request
 
     private string $httpMethod;
     private string $uri;
-    private array $payload;
+    private $payload;
 
     public function __construct()
     {
@@ -42,7 +42,7 @@ class Request
         return $this->uri;
     }
 
-    public function getPayload(): array
+    public function getPayload()
     {
         return $this->payload;
     }
