@@ -6,9 +6,6 @@ use App\Http\Response;
 
 require_once "./vendor/autoload.php";
 
-if(!isset($_SERVER["HTTPS"])){
-    return;
-}
 $origin = $_SERVER['HTTP_ORIGIN'];
 $allowedDomains = [
     'http://localhost:4200',
