@@ -20,11 +20,7 @@ class Request
     {
         if($this->httpMethod == 'GET') return false;
 
-        $this->payload = $_POST ?? [];
-
-        $inputRaw = file_get_contents('php://input');
-        $inputs = (strlen($inputRaw)) && empty($_POST) ? json_decode($inputRaw, true) : $this->payload;
-        $this->payload = array_map('strip_tags', $inputs);
+        $this->payload = json_decode(file_get_contents('php://input'), true);
 
         return true;
     }
