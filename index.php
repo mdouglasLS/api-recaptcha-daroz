@@ -1,12 +1,7 @@
 <?php
-
-use App\Controller\Api;
-use App\Http\Request;
-use App\Http\Response;
-
-require_once "./vendor/autoload.php";
-
-$origin = $_SERVER['HTTP_ORIGIN'];
+header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Curl-Method, Token");
+header("Access-Control-Allow-Methods: POST, OPTIONS, PUT, DELETE");
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 $allowedDomains = [
     'http://localhost:4200',
     'https://daroz.dev',
@@ -16,8 +11,12 @@ $allowedDomains = [
 if (in_array($origin, $allowedDomains)) {
     header('Access-Control-Allow-Origin: ' . $origin);
 }
-header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Curl-Method, Token");
-header("Access-Control-Allow-Methods: POST, OPTIONS, PUT, DELETE");
+
+use App\Controller\Api;
+use App\Http\Request;
+use App\Http\Response;
+
+require_once "./vendor/autoload.php";
 
 $req = new Request;
 $res = new Response;
